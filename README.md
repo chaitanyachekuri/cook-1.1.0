@@ -1,1 +1,1 @@
-Base code for a new application.
+Base code for a new applications.
