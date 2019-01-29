@@ -7,7 +7,8 @@ import {Observable} from "rxjs";
 export class ApiEmitterServcie implements OnInit{
   public socket:any;
   public static readonly connect = 'connected';
-  public static readonly test = 'test';
+  public static readonly authenticate = 'authenticate';
+  public static readonly authenticated = 'authenticated';
 
   ngOnInit(): void {
   }

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ApiManagerService} from "../../services/api-manager.service";
+import {ApiEmitterServcie} from "../../services/api-emitter.servcie";
 
 @Component({
   selector: 'app-register',
@@ -15,7 +16,11 @@ export class RegisterComponent implements OnInit {
 
     data : Date = new Date();
 
-    constructor(private fb: FormBuilder, private apiManager: ApiManagerService) { }
+    constructor(private fb: FormBuilder, private apiManager: ApiManagerService, private apiEmitter: ApiEmitterServcie) {
+        this.apiEmitter.recieveEvent(ApiEmitterServcie.authenticated).subscribe(v =>{
+            console.log(v);
+        })
+    }
 
     ngOnInit() {
         let body = document.getElementsByTagName('body')[0];
@@ -36,12 +41,10 @@ export class RegisterComponent implements OnInit {
     }
 
     register(){
-            this.apiManager.fetchData(ApiManagerService.register, ApiManagerService.POST, this.registerForm.value).toPromise().then(v =>{
-                console.log(v);}).catch(err =>{
-                console.log(err);})
+            this.apiEmitter.sendEvent(ApiEmitterServcie.authenticate,this.registerForm.value);
     }
 
-    ngOnDestroy(){
+    static ngOnDestroy(){
         let body = document.getElementsByTagName('body')[0];
         body.classList.remove('signup-page');
         let navbar = document.getElementsByTagName('nav')[0];

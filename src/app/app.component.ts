@@ -5,8 +5,9 @@ import { Router, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { DOCUMENT } from '@angular/platform-browser';
-import { LocationStrategy, PlatformLocation, Location } from '@angular/common';
+import { Location } from '@angular/common';
 import { NavbarComponent } from './shared/navbar/navbar.component';
+import {ApiEmitterServcie} from "./services/api-emitter.servcie";
 
 @Component({
     selector: 'app-root',
@@ -17,10 +18,12 @@ export class AppComponent implements OnInit {
     private _router: Subscription;
     @ViewChild(NavbarComponent) navbar: NavbarComponent;
 
-    constructor( private renderer : Renderer, private router: Router, @Inject(DOCUMENT,) private document: any, private element : ElementRef, public location: Location) {}
+    constructor( private renderer : Renderer, private router: Router, @Inject(DOCUMENT,) private document: any, private element : ElementRef, public location: Location, private apiEmitter: ApiEmitterServcie) {
+
+    }
     ngOnInit() {
         var navbar : HTMLElement = this.element.nativeElement.children[0].children[0];
-        this._router = this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe((event: NavigationEnd) => {
+        this._router = this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe(() => {
             if (this.location.path() !== '/sections') {
                 if (window.outerWidth > 991) {
                     window.document.children[0].scrollTop = 0;
@@ -30,7 +33,7 @@ export class AppComponent implements OnInit {
             }
             this.navbar.sidebarClose();
 
-            this.renderer.listenGlobal('window', 'scroll', (event) => {
+            this.renderer.listenGlobal('window', 'scroll', () => {
                 const number = window.scrollY;
                 var _location = this.location.path();
                 _location = _location.split('/')[2];
@@ -62,15 +65,14 @@ export class AppComponent implements OnInit {
 
         }
 
+        this.apiEmitter.recieveEvent(ApiEmitterServcie.connect).subscribe(v =>{
+            console.log(v);
+        });
+
     }
     removeFooter() {
         var titlee = this.location.prepareExternalUrl(this.location.path());
         titlee = titlee.slice( 1 );
-        if(titlee === 'signup' || titlee === 'nucleoicons'){
-            return false;
-        }
-        else {
-            return true;
-        }
+        return !(titlee === 'signup' || titlee === 'nucleoicons');
     }
 }
